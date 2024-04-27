@@ -1,7 +1,7 @@
 use std::fmt;
-use std::ops::{Add, Mul};
+// use std::ops::{Add, Mul};
 use rand::Rng;
-use crate::macros::*;
+// use crate::macros::*;
 
 #[derive(Debug, Clone)]
 pub struct Matrix {
@@ -122,7 +122,8 @@ impl Matrix {
             data: buffer,
         }
     }
-    pub fn map(&mut self, func: fn(f64) -> f64) -> Matrix {
+    // pub fn map(&mut self, func: fn(&f64) -> f64) -> Matrix {
+    pub fn map<F>(&mut self, func: F) -> Matrix where F: Fn(&f64) -> f64 {
         let mut result = Matrix {
             rows: self.rows,
             cols: self.cols,

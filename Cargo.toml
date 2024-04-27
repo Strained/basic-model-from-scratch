@@ -3,5 +3,5 @@
 members = [
     "matrix",
     "neural-network",
-    "consumer-binary"
+    "consumer_binary"
 ]
