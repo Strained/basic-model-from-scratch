@@ -1,0 +1,9 @@
+[package]
+name = "neural-network"
+version = "0.1.0"
+edition = "2021"
+
+
+[dependencies]
+derive_builder = "0.12.0"   ## to-do: try to update to latest version
+matrix = {path = "../matrix"}
