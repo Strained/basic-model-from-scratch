@@ -1,7 +1,3 @@
 [workspace]
-
-members = [
-    "matrix",
-    "neural-network",
-    "consumer_binary"
-]
+members = ["matrix", "neural-network", "consumer_binary"]
+resolver = "2"

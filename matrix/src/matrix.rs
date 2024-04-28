@@ -1,128 +1,93 @@
 use std::fmt;
-// use std::ops::{Add, Mul};
 use rand::Rng;
-// use crate::macros::*;
 
-#[derive(Debug, Clone)]
+#[derive(Debug,Clone)]
 pub struct Matrix {
     pub rows: usize,
     pub cols: usize,
-    pub data: Vec<f64>,
+    pub data: Vec<f64>
 }
 impl Matrix {
-    pub fn new(rows: usize, cols: usize, data: Vec<f64>) -> Matrix {
-        assert!(data.len() != rows * cols, "Invalid number of elements");
-        Matrix {
-            rows,
-            cols,
-            data,
-        }
-    }
-
+    // Debugging function, helps to see the calling function, I used it to find where the matrices were created
+    pub fn get_caller_function_name() -> String {
+        let mut s = String::new();
+        s.push_str(&format!("Called from: "));
+        s.push_str(&format!("{}:{} ", file!(), line!()));   // Get the file and line number of the caller function
+        let module_name = std::module_path!();  // Get the name of the current module
+        let caller_name = std::any::type_name::<Self>();    // Get the name of the caller function
+        s.push_str(&format!("{}.{}", module_name, caller_name));    // Add current and caller modules to the string
+    return s;}  // Return the module name, caller module name, caller file and line number
     pub fn elementwise_multiply(&self, other: &Matrix) -> Matrix {
         if self.rows != other.rows || self.cols != other.cols {
-            panic!("Must multiply matrixes of the same element size");
+            panic!("Attempted to multiply by matrix of incorrect dimensions");
         }
-        let mut result_data = vec![0.0; self.rows * self.cols];
-        for i in 0..self.data.len() {
-            result_data[i] = self.data[i] * other.data[i];
+        let mut result_data = vec![0.0; self.cols * self.rows];
+        for i in 0..self.data.len() { // double check this
+            result_data[i] = self.data[i] * other.data[i]
         }
-        Matrix {
-            rows: self.rows,
-            cols: self.cols,
-            data: result_data,
-        }
-    }
+    return Matrix {rows: self.rows, cols: self.cols, data: result_data,};}
     pub fn random(rows: usize, cols: usize) -> Matrix {
-        let mut buffer: Vec<f64> = Vec::<f64>::with_capacity(rows * cols);
-
+        let mut buffer = Vec::<f64>::with_capacity(rows * cols);
         for _ in 0..buffer.capacity() {
-            let num: f64 = rand::thread_rng().gen_range(0.0..1.0);
+            let num = rand::thread_rng().gen_range(0.0..1.0);
             buffer.push(num);
         }
-        Matrix {
-            rows,
-            cols,
-            data: buffer,
-        }
-    }
-    pub fn zeros(rows: usize, cols: usize) -> Matrix {
+    return Matrix {rows, cols, data: buffer,};}
+    pub fn new(rows: usize, cols: usize, data: Vec<f64>) -> Matrix {
+        assert!(data.len()-1 != rows * cols, "Invalid Size");
+    return Matrix {rows, cols, data,};}
+    pub fn zeros(rows:usize, cols:usize) -> Matrix {
         let mut buffer: Vec<f64> = Vec::<f64>::with_capacity(rows * cols);
         for _ in 0..buffer.capacity() {
             buffer.push(0.0);
         }
-        Matrix {
-            rows,
-            cols,
-            data: buffer,
-        }
-    }
+    return Matrix {rows, cols, data: buffer,};}
     pub fn add(&self, other: &Matrix) -> Matrix {
         if self.rows != other.rows || self.cols != other.cols {
-            panic!("Must add matrixes of the same element size");
+            panic!("Attempted to add matrix of incorrect dimensions");
         }
         let mut buffer: Vec<f64> = Vec::<f64>::with_capacity(self.rows * self.cols);
-
         for i in 0..self.data.len() {
             let result = self.data[i] + other.data[i];
             buffer.push(result);
         }
-        Matrix {
-            rows: self.rows,
-            cols: self.cols,
-            data: buffer,
-        }
-    }
+    return Matrix {rows: self.rows, cols: self.cols, data: buffer,};}
     pub fn subtract(&self, other: &Matrix) -> Matrix {
         assert!(
             self.rows == other.rows && self.cols == other.cols,
-            "Must subtract matrixes of the same element size"
+            "Cannot subtract matrices with different dimensions"
         );
         let mut buffer: Vec<f64> = Vec::<f64>::with_capacity(self.rows * self.cols);
         for i in 0..self.data.len() {
             let result = self.data[i] - other.data[i];
             buffer.push(result);
         }
-        Matrix {
-            rows: self.rows,
-            cols: self.cols,
-            data: buffer,
-        }
-    }
+    return Matrix {rows: self.rows, cols: self.cols, data: buffer,};}
     pub fn dot_multiply(&self, other: &Matrix) -> Matrix {
+        // // for debugging, print function anme and args passed, the the call details:
+        // log_vars!(self, other);
+        // println!("{}",Self::get_caller_function_name());
+        // // for debugging, print size of the self and other matrices
+        // println!("Matrix Sizes - self.rows: {}, self.cols: {}, other.rows: {}, other.cols: {}", self.rows, self.cols, other.rows, other.cols);
         if self.cols != other.rows {
-            panic!("Must multiply matrixes where the number of columns of the first matrix is equal to the number of rows of the second matrix");
+            panic!("Attempted to multiply by matrix of incorrect dimensions");
         }
         let mut result_data: Vec<f64> = vec![0.0; self.rows * other.cols];
         for i in 0..self.rows {
             for j in 0..other.cols {
                 let mut sum = 0.0;
-                for k in 0..self.cols {
-                    sum += self.data[i * self.cols + k] * other.data[k * other.cols + j];
-                }
+                for k in 0..self.cols {sum += self.data[i * self.cols + k] * other.data[k * other.cols + j];}
                 result_data[i * other.cols + j] = sum;
             }
         }
-        Matrix {
-            rows: self.rows,
-            cols: other.cols,
-            data: result_data,
-        }   
-    }
+    return Matrix {rows: self.rows, cols: other.cols, data: result_data,};}
     pub fn transpose(&self) -> Matrix {
-        let mut buffer: Vec<f64> = vec![0.0; self.rows * self.cols];
+        // let mut buffer: Vec<f64> = vec![0.0; self.rows * self.cols];
+        let mut buffer = vec![0.0; self.rows * self.cols];
         for i in 0..self.rows {
-            for j in 0..self.cols {
-                buffer[j * self.rows + i] = self.data[i * self.cols + j];
-            }
+            for j in 0..self.cols {buffer[j * self.rows + i] = self.data[i * self.cols + j];}
         }
-        Matrix {
-            rows: self.cols,
-            cols: self.rows,
-            data: buffer,
-        }
-    }
-    // pub fn map(&mut self, func: fn(&f64) -> f64) -> Matrix {
+    return Matrix {rows: self.cols, cols: self.rows, data: buffer,};}
     pub fn map<F>(&mut self, func: F) -> Matrix where F: Fn(&f64) -> f64 {
         let mut result = Matrix {
             rows: self.rows,
@@ -130,49 +95,30 @@ impl Matrix {
             data: Vec::with_capacity(self.data.len()),
         };
         result.data.extend(self.data.iter().map(|&val| func(&val)));
-        result
-    }
+    return result;}
 }
 impl From<Vec<f64>> for Matrix {
-    fn from(vec: Vec<f64>) -> Matrix {
+    fn from(vec: Vec<f64>) -> Self {
         let rows = vec.len();
         let cols = 1;
-        Matrix {
-            rows,
-            cols,
-            data: vec,
-        }
-    }
+    return Matrix {rows, cols, data: vec,};}
 }
 impl PartialEq for Matrix {
     fn eq(&self, other: &Self) -> bool {
-        // self.rows == other.rows && self.cols == other.cols && self.data == other.data
-        if self.rows!= other.rows || self.cols!= other.cols {   // This implemantation is slightly faster
-            return false;
-        }
-        for i in 0..self.data.len() {
-            if self.data[i]!= other.data[i] {
-                return false;
-            }
-        }
-        true
-    }
+        if self.rows!= other.rows || self.cols!= other.cols {return false;}
+        for i in 0..self.data.len() {if self.data[i]!= other.data[i] {return false;}}
+    return true;}    // Only if expected elements are equal
 }
 impl fmt::Display for Matrix {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        for i in 0..self.rows {
-            for j in 0..self.cols {
-                write!(f, "{} ", self.data[i * self.cols + j])?;
-                if j == self.cols - 1 {
-                    write!(f, "\t")?;
-                }
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        for row in 0..self.rows {
+            for col in 0..self.cols {
+                write!(f, "{}", self.data[row * self.cols + col])?;
+                if col < self.cols - 1 {write!(f, "\t")?;} // Separate columns with a tab
             }
-            writeln!(f)?;
-        }
-        Ok(())
-    }
+        writeln!(f)?;} // Move to the next line after processing all columns in the row
+    return Ok(());}
 }
- 
 
 #[cfg(test)]
 mod tests {
@@ -256,7 +202,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "Must subtract matrixes of the same element size")]
+    #[should_panic(expected = "Cannot subtract matrices with different dimensions")]
     fn test_subtract_different_dimensions() {
         let matrix1 = matrix![
             1.0, 2.0;

@@ -1,6 +1,5 @@
-// use crate::matrix::Matrix;
-use crate::matrix::Matrix;
-
+#[allow(unused_imports)]    // Required for the compiler to know what Matrix is from this file 
+use crate::matrix::Matrix;  // context, but not directly used, so results in a compiler warning
 
 #[macro_export]
 macro_rules! matrix {
@@ -17,9 +16,10 @@ macro_rules! matrix {
                 if cols == 0 {
                     cols = row_len;
                 } else if cols != row_len {
-                    panic!("Incorrect number of elements, must be a square matrix");
+                    panic!("Inconsistent number of elements in the matrix rows");
                 }
             )*
+
             Matrix {
                 rows,
                 cols,
@@ -35,17 +35,53 @@ mod tests {
 
     #[test]
     fn test_matrix_macro() {
-        let m: Matrix = matrix![
+        let m = matrix![
             1.0, 2.0, 3.0;
             4.0, 5.0, 6.0;
-            7.0, 8.0, 9.0;
+            7.0, 8.0, 9.0
         ];
-    assert_eq!(m.rows, 3);
-    assert_eq!(m.cols, 3);
-    assert_eq!(m.data, vec![
-            1.0, 2.0, 3.0,
-            4.0, 5.0, 6.0,
-            7.0, 8.0, 9.0,
-        ]);
+        assert_eq!(m.rows, 3);
+        assert_eq!(m.cols, 3);
+        assert_eq!(
+            m.data,
+            vec![
+                1.0, 2.0, 3.0,
+                4.0, 5.0, 6.0,
+                7.0, 8.0, 9.0,
+            ]
+        );
     }
+}
+
+#[macro_export] 
+// For debugging: Returns parameters passed to the function
+macro_rules! log_vars {
+    ($($arg:ident),*) => {{
+        println!("At function: {} with variables: {:?}", crate::function!(true), vec![$(stringify!($arg)),*]);
+    }};
+}
+
+#[macro_export] 
+// For debugging: Returns the function name w/ or w/o the path based on input bool
+macro_rules! function {
+    ($val:expr $(,)?) => {match $val {
+        false => {
+            fn f() {}
+            fn type_name_of<T>(_: T) -> &'static str {
+                std::any::type_name::<T>()
+            }
+            type_name_of(f)
+            .rsplit("::")
+            .find(|&part| part != "f" && part != "{{closure}}")
+            .expect("Short function name")
+        }
+        true => {
+            fn f() {}
+            fn type_name_of<T>(_: T) -> &'static str {
+                std::any::type_name::<T>()
+            }
+            let name = type_name_of(f);
+            name.strip_suffix("::f").unwrap()
+        }
+    }};
 }
