@@ -1,5 +1,7 @@
 use matrix::matrix::Matrix;
 use crate::activations::Activation;
+use avance::AvanceBar;
+
 
 pub struct Network {
     layers: Vec<usize>,  // amount of neurons in each layer
@@ -49,12 +51,15 @@ impl Network {
     }}
     
     pub fn train(&mut self, inputs: Vec<Vec<f64>>, targets: Vec<Vec<f64>>, epochs: u32) {
+        let bar = AvanceBar::new(epochs as u64);
+        bar.set_desc("Progress");
         for i in 1..=epochs {
             if epochs < 100 || i % (epochs / 100) == 0 {
-             println!("Epoch {} of {}", i, epochs);
+                // println!("Epoch {} of {}", i, epochs);
             }
             for j in 0..inputs.len() {
                 let outputs = self.feed_forward(Matrix::from(inputs[j].clone()));
                 self.back_propogate(outputs,Matrix::from(targets[j].clone()));
-    }}}
+        
+    };bar.inc();};}
 }

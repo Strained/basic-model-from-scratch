@@ -6,3 +6,4 @@ edition = "2021"
 
 [dependencies]
 neural-network = {path = "../neural-network"}
+structopt = "0.3.21"
