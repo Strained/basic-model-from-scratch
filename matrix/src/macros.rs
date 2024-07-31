@@ -29,35 +29,12 @@ macro_rules! matrix {
     };
 }
 
-#[cfg(test)]
-mod tests {
-    use super::Matrix;
-
-    #[test]
-    fn test_matrix_macro() {
-        let m = matrix![
-            1.0, 2.0, 3.0;
-            4.0, 5.0, 6.0;
-            7.0, 8.0, 9.0
-        ];
-        assert_eq!(m.rows, 3);
-        assert_eq!(m.cols, 3);
-        assert_eq!(
-            m.data,
-            vec![
-                1.0, 2.0, 3.0,
-                4.0, 5.0, 6.0,
-                7.0, 8.0, 9.0,
-            ]
-        );
-    }
-}
 
 #[macro_export] 
 // For debugging: Returns parameters passed to the function
 macro_rules! log_vars {
     ($($arg:ident),*) => {{
-        println!("At function: {} with variables: {:?}", crate::function!(true), vec![$(stringify!($arg)),*]);
+        println!("At function: {} with variables: {:?}", $crate::function!(true), vec![$(stringify!($arg)),*]);
     }};
 }
 
@@ -84,4 +61,33 @@ macro_rules! function {
             name.strip_suffix("::f").unwrap()
         }
     }};
+}
+
+
+#[cfg(test)]
+/// Tests the `matrix!` macro by creating a 3x3 matrix and asserting its properties.
+///
+/// This test verifies that the `matrix!` macro correctly creates a `Matrix` struct 
+/// with the expected number of rows and columns, and the expected data values.
+mod tests {
+    use super::Matrix;
+
+    #[test]
+    fn test_matrix_macro() {
+        let m = matrix![
+            1.0, 2.0, 3.0;
+            4.0, 5.0, 6.0;
+            7.0, 8.0, 9.0
+        ];
+        assert_eq!(m.rows, 3);
+        assert_eq!(m.cols, 3);
+        assert_eq!(
+            m.data,
+            vec![
+                1.0, 2.0, 3.0,
+                4.0, 5.0, 6.0,
+                7.0, 8.0, 9.0,
+            ]
+        );
+    }
 }

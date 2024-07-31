@@ -1,6 +1,6 @@
 # Basic Model From Scratch
 
-A Rust-based neural network framework implementing a basic XOR function intended as a learning exercise.
+A Rust-based neural network framework implementing a basic XOR function intended for learning and experimentation.
 
 - This neural network trains to learn the XOR function.
 - The inputs represent the two binary inputs
